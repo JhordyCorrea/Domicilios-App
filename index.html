@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<title>DomiGuaviare · Domicilios</title>
+<style>
+:root { --negro: #0a0a0a; --negro2: #111111; --negro3: #1a1a1a; --negro4: #2a2a2a; --blanco: #f5f5f5; --gris: #8f8f8f; --gris-tenue: #5a5a5a; --dorado: #c9a84c; --dorado2: #e5c870; --dorado3: #5a5648; --prot: #4CAF80; --lip: #E87C4A; --carb: #4A8CE8; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+body { background: var(--negro); color: var(--blanco); font-size: 15px; min-height: 100vh; overflow-x: hidden; }
+.header { background: linear-gradient(135deg, #000 0%, #111 60%, #1a1a1a 100%); border-bottom: 1px solid var(--negro4); padding: 14px 16px 12px; position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; align-items: center; justify-content: space-between; }
+.logo { font-family: Georgia, serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; color: var(--dorado); text-transform: uppercase; }
+.logo-sub { font-size: 10px; color: var(--dorado3); letter-spacing: 3px; margin-top: 2px; }
+.fecha { font-size: 11px; color: var(--gris); margin-top: 4px; }
+.buscador { margin: 12px 12px 0; background: var(--negro2); border: 1px solid var(--negro4); border-radius: 14px; padding: 12px; }
+.buscador-label { font-size: 11px; color: var(--dorado3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.buscador-input-wrap { position: relative; }
+.buscador-input { width: 100%; background: var(--negro3); border: 1px solid var(--negro4); border-radius: 10px; padding: 11px 38px 11px 14px; color: var(--blanco); font-size: 14px; outline: none; }
+.buscador-input:focus { border-color: var(--dorado3); }
+.buscador-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--gris); }
+.seccion-titulo { display: flex; align-items: center; justify-content: space-between; margin: 16px 12px 10px; }
+.seccion-titulo-texto { font-family: Georgia, serif; font-size: 13px; font-weight: 700; color: var(--dorado); letter-spacing: 1.5px; text-transform: uppercase; }
+.btn-nuevo { background: linear-gradient(135deg, var(--dorado3), var(--dorado)); color: var(--negro); border: none; border-radius: 10px; padding: 9px 16px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(201,168,76,0.25); }
+.lista-clientes { padding: 0 12px 100px; }
+.cliente-card { background: var(--negro2); border: 1px solid var(--negro4); border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; }
+.cliente-card:active { transform: scale(0.99); background: var(--negro3); }
+.cliente-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+.cliente-card-nombre { font-family: Georgia, serif; font-size: 16px; font-weight: 700; color: var(--blanco); line-height: 1.3; flex: 1; min-width: 0; }
+.cliente-card-tel { font-size: 11px; color: var(--prot); font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.cliente-card-dir { font-size: 12px; color: var(--gris); line-height: 1.5; margin-bottom: 6px; }
+.cliente-card-senas { font-size: 11px; color: var(--dorado3); line-height: 1.5; background: rgba(201,168,76,0.06); border-radius: 6px; padding: 6px 8px; margin-bottom: 10px; font-style: italic; }
+.cliente-card-acciones { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+.btn-accion { background: var(--negro3); border: 1px solid var(--negro4); border-radius: 8px; padding: 9px 4px; color: var(--dorado); font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; line-height: 1.3; transition: all 0.15s; }
+.btn-accion:active { transform: scale(0.95); }
+.btn-accion.llamar { color: var(--prot); border-color: rgba(76,175,128,0.3); }
+.btn-accion.whatsapp { color: #25D366; border-color: rgba(37,211,102,0.3); }
+.btn-accion.navegar { color: var(--carb); border-color: rgba(74,140,232,0.3); }
+.btn-accion.editar { color: var(--dorado); }
+.btn-accion:disabled { color: var(--gris-tenue); border-color: var(--negro4); cursor: not-allowed; opacity: 0.4; }
+.empty { text-align: center; padding: 60px 20px; color: var(--gris); font-size: 13px; line-height: 1.8; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; }
+.modal-overlay.open { display: flex; align-items: flex-end; }
+.modal { background: var(--negro2); border-radius: 20px 20px 0 0; width: 100%; max-height: 92vh; display: flex; flex-direction: column; border-top: 2px solid var(--dorado3); }
+.modal-handle { width: 40px; height: 4px; background: var(--negro4); border-radius: 2px; margin: 12px auto 0; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 8px; }
+.modal-titulo { font-size: 15px; font-weight: 700; color: var(--dorado); }
+.btn-cerrar { background: none; border: none; color: var(--gris); font-size: 24px; cursor: pointer; padding: 0; line-height: 1; }
+.modal-body { padding: 8px 16px 32px; overflow-y: auto; flex: 1; }
+.form-grupo { margin-bottom: 14px; }
+.form-label { font-size: 11px; color: var(--gris); margin-bottom: 6px; display: block; font-weight: 600; }
+.form-label.req::after { content: ' *'; color: var(--lip); }
+.form-input { width: 100%; background: var(--negro3); border: 1px solid var(--negro4); border-radius: 10px; padding: 12px 14px; color: var(--blanco); font-size: 14px; outline: none; font-family: inherit; }
+.form-input:focus { border-color: var(--dorado3); }
+.form-input::placeholder { color: var(--gris-tenue); }
+textarea.form-input { resize: vertical; min-height: 60px; }
+.gps-card { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 1px solid var(--dorado3); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+.gps-titulo { font-size: 11px; color: var(--dorado3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 700; }
+.gps-coords { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.gps-coord-box { background: var(--negro3); border-radius: 8px; padding: 10px; text-align: center; }
+.gps-coord-lbl { font-size: 10px; color: var(--gris); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.gps-coord-val { font-family: monospace; font-size: 13px; font-weight: 700; color: var(--dorado); }
+.btn-gps { width: 100%; background: var(--dorado); color: var(--negro); border: none; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.15s; }
+.btn-gps:active { transform: scale(0.98); }
+.btn-gps:disabled { background: var(--negro4); color: var(--gris); cursor: not-allowed; }
+.gps-status { font-size: 11px; color: var(--gris); text-align: center; margin-top: 8px; line-height: 1.5; }
+.gps-status.ok { color: var(--prot); }
+.gps-status.error { color: var(--lip); }
+.form-acciones { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 20px; }
+.btn-cancelar { background: var(--negro3); border: 1px solid var(--negro4); color: var(--gris); border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-guardar { background: var(--dorado); color: var(--negro); border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 800; cursor: pointer; }
+.btn-eliminar { width: 100%; background: none; border: 1px solid #e05555; color: #e05555; border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--dorado); color: var(--negro); padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 700; box-shadow: 0 4px 20px rgba(201,168,76,0.3); z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="logo">·DomiGuaviare·</div>
+      <div class="logo-sub">DOMICILIOS · SAN JOSÉ</div>
+      <div class="fecha" id="fechaHoy"></div>
+    </div>
+  </div>
+</div>
+
+<div class="buscador">
+  <div class="buscador-label">🔍 Buscar cliente</div>
+  <div class="buscador-input-wrap">
+    <input class="buscador-input" id="buscarCliente" placeholder="Nombre del cliente..." oninput="filtrarClientes()" />
+    <span class="buscador-icon">🔍</span>
+  </div>
+</div>
+
+<div class="seccion-titulo">
+  <div class="seccion-titulo-texto">👤 Mis Clientes</div>
+  <button class="btn-nuevo" onclick="abrirFormCliente()">+ Nuevo</button>
+</div>
+
+<div class="lista-clientes" id="listaClientes"></div>
+
+<div class="modal-overlay" id="modalCliente">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-titulo" id="modalClienteTitulo">Nuevo Cliente</div>
+      <button class="btn-cerrar" onclick="cerrarModal('modalCliente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grupo">
+        <label class="form-label req">Nombre del cliente</label>
+        <input class="form-input" id="inpNombre" placeholder="Ej: Juan Pérez" />
+      </div>
+      <div class="form-grupo">
+        <label class="form-label">Celular / WhatsApp</label>
+        <input class="form-input" id="inpTelefono" type="tel" placeholder="Ej: 315 123 4567" />
+      </div>
+      <div class="form-grupo">
+        <label class="form-label">Dirección escrita</label>
+        <input class="form-input" id="inpDireccion" placeholder="Ej: Calle 5 # 12-34, Barrio El Centro" />
+      </div>
+      <div class="form-grupo">
+        <label class="form-label">Señas / Referencias</label>
+        <textarea class="form-input" id="inpSenas" placeholder="Ej: Portón negro, al lado de la tienda de Doña Rosa, casa de dos pisos"></textarea>
+      </div>
+      <div class="gps-card">
+        <div class="gps-titulo">📍 Coordenadas GPS exactas</div>
+        <div class="gps-coords">
+          <div class="gps-coord-box">
+            <div class="gps-coord-lbl">Latitud</div>
+            <div class="gps-coord-val" id="gpsLat">—</div>
+          </div>
+          <div class="gps-coord-box">
+            <div class="gps-coord-lbl">Longitud</div>
+            <div class="gps-coord-val" id="gpsLng">—</div>
+          </div>
+        </div>
+        <button class="btn-gps" id="btnGPS" onclick="capturarGPS()">📍 Capturar ubicación actual</button>
+        <div class="gps-status" id="gpsStatus">Presiona el botón estando en la casa del cliente.</div>
+      </div>
+      <div class="form-grupo">
+        <label class="form-label">Notas adicionales</label>
+        <textarea class="form-input" id="inpNotas" placeholder="Ej: No tocar el timbre, llamar al llegar. Enviar WhatsApp primero."></textarea>
+      </div>
+      <div class="form-acciones">
+        <button class="btn-cancelar" onclick="cerrarModal('modalCliente')">Cancelar</button>
+        <button class="btn-guardar" onclick="guardarCliente()">💾 Guardar</button>
+      </div>
+      <button class="btn-eliminar" id="btnEliminarCliente" style="display:none;" onclick="eliminarClienteActual()">🗑 Eliminar cliente</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+  <script>
+const DB_KEY = 'domi_clientes_v1';
+let clientes = [];
+let clienteEditandoId = null;
+let gpsActual = { lat: null, lng: null };
+
+function cargarClientes() {
+  try { const raw = localStorage.getItem(DB_KEY); if(raw) clientes = JSON.parse(raw) || []; else clientes = []; } catch(e) { clientes = []; }
+}
+
+function guardarLocal() {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(clientes)); } catch(e) { mostrarToast('⚠️ Error guardando. Almacenamiento lleno.'); }
+}
+
+function generarId() { return 'cli_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+function renderClientes(filtro) {
+  const lista = document.getElementById('listaClientes');
+  let filtrados = clientes;
+  if(filtro && filtro.trim()) {
+    const q = filtro.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    filtrados = clientes.filter(c => {
+      const nombre = (c.nombre||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const dir = (c.direccion||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const tel = (c.telefono||'').toLowerCase();
+      return nombre.includes(q) || dir.includes(q) || tel.includes(q);
+    });
+  }
+  if(filtrados.length === 0) {
+    lista.innerHTML = `<div class="empty"><div class="empty-icon">👤</div>${clientes.length === 0 ? 'Aún no tienes clientes registrados.<br>Toca "+ Nuevo" para agregar el primero.' : 'Sin resultados para tu búsqueda.'}</div>`;
+    return;
+  }
+  lista.innerHTML = filtrados.map(c => {
+    const tieneGPS = c.lat && c.lng;
+    const tieneTel = c.telefono && c.telefono.trim();
+    return `
+      <div class="cliente-card">
+        <div class="cliente-card-header">
+          <div class="cliente-card-nombre">${escapeHTML(c.nombre)}</div>
+          ${tieneTel ? `<div class="cliente-card-tel">📱 ${escapeHTML(c.telefono)}</div>` : ''}
+        </div>
+        ${c.direccion ? `<div class="cliente-card-dir">📌 ${escapeHTML(c.direccion)}</div>` : ''}
+        ${c.senas ? `<div class="cliente-card-senas">💡 ${escapeHTML(c.senas)}</div>` : ''}
+        ${c.notas ? `<div class="cliente-card-dir" style="color:var(--dorado3);font-size:11px;">📝 ${escapeHTML(c.notas)}</div>` : ''}
+        <div class="cliente-card-acciones">
+          <button class="btn-accion llamar" ${!tieneTel ? 'disabled' : ''} onclick="event.stopPropagation();llamar('${c.id}')">📞<br>Llamar</button>
+          <button class="btn-accion whatsapp" ${!tieneTel ? 'disabled' : ''} onclick="event.stopPropagation();whatsapp('${c.id}')">💬<br>WhatsApp</button>
+          <button class="btn-accion navegar" ${!tieneGPS ? 'disabled' : ''} onclick="event.stopPropagation();navegar('${c.id}')">🗺️<br>Navegar</button>
+          <button class="btn-accion editar" onclick="event.stopPropagation();editarCliente('${c.id}')">✏️<br>Editar</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filtrarClientes() { renderClientes(document.getElementById('buscarCliente').value); }
+
+function llamar(id) {
+  const c = clientes.find(x => x.id === id); if(!c || !c.telefono) return;
+  window.location.href = 'tel:' + c.telefono.replace(/[^0-9+]/g, '');
+}
+
+function whatsapp(id) {
+  const c = clientes.find(x => x.id === id); if(!c || !c.telefono) return;
+  let tel = c.telefono.replace(/[^0-9]/g, ''); if(tel.length === 10) tel = '57' + tel;
+  const texto = encodeURIComponent('Hola ' + c.nombre + ', estoy en camino con tu domicilio.');
+  window.open('https://wa.me/' + tel + '?text=' + texto, '_blank');
+}
+
+function navegar(id) {
+  const c = clientes.find(x => x.id === id); if(!c || !c.lat || !c.lng) return;
+  window.open('https://www.google.com/maps/dir/?api=1&destination=' + c.lat + ',' + c.lng, '_blank');
+}
+
+function abrirFormCliente() {
+  clienteEditandoId = null; gpsActual = { lat: null, lng: null };
+  document.getElementById('modalClienteTitulo').textContent = 'Nuevo Cliente';
+  document.getElementById('inpNombre').value = '';
+  document.getElementById('inpTelefono').value = '';
+  document.getElementById('inpDireccion').value = '';
+  document.getElementById('inpSenas').value = '';
+  document.getElementById('inpNotas').value = '';
+  document.getElementById('gpsLat').textContent = '—';
+  document.getElementById('gpsLng').textContent = '—';
+  document.getElementById('gpsStatus').textContent = 'Presiona el botón estando en la casa del cliente.';
+  document.getElementById('gpsStatus').className = 'gps-status';
+  document.getElementById('btnEliminarCliente').style.display = 'none';
+  document.getElementById('modalCliente').classList.add('open');
+}
+
+function editarCliente(id) {
+  const c = clientes.find(x => x.id === id); if(!c) return;
+  clienteEditandoId = id; gpsActual = { lat: c.lat || null, lng: c.lng || null };
+  document.getElementById('modalClienteTitulo').textContent = 'Editar Cliente';
+  document.getElementById('inpNombre').value = c.nombre || '';
+  document.getElementById('inpTelefono').value = c.telefono || '';
+  document.getElementById('inpDireccion').value = c.direccion || '';
+  document.getElementById('inpSenas').value = c.senas || '';
+  document.getElementById('inpNotas').value = c.notas || '';
+  document.getElementById('gpsLat').textContent = c.lat ? c.lat.toFixed(6) : '—';
+  document.getElementById('gpsLng').textContent = c.lng ? c.lng.toFixed(6) : '—';
+  if(c.lat && c.lng) {
+    document.getElementById('gpsStatus').textContent = '✓ Ubicación ya guardada. Puedes recapturar si es necesario.';
+    document.getElementById('gpsStatus').className = 'gps-status ok';
+  } else {
+    document.getElementById('gpsStatus').textContent = 'Aún no hay ubicación guardada para este cliente.';
+    document.getElementById('gpsStatus').className = 'gps-status';
+  }
+  document.getElementById('btnEliminarCliente').style.display = 'block';
+  document.getElementById('modalCliente').classList.add('open');
+}
+
+function capturarGPS() {
+  const btn = document.getElementById('btnGPS'); const status = document.getElementById('gpsStatus');
+  if(!navigator.geolocation) { status.textContent = '❌ Tu navegador no soporta GPS.'; status.className = 'gps-status error'; return; }
+  btn.disabled = true; btn.textContent = '⏳ Obteniendo ubicación...'; status.textContent = 'Espera unos segundos...'; status.className = 'gps-status';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      gpsActual.lat = pos.coords.latitude; gpsActual.lng = pos.coords.longitude;
+      const prec = Math.round(pos.coords.accuracy);
+      document.getElementById('gpsLat').textContent = gpsActual.lat.toFixed(6);
+      document.getElementById('gpsLng').textContent = gpsActual.lng.toFixed(6);
+      status.textContent = '✓ Ubicación capturada (precisión: ' + prec + 'm)';
+      status.className = 'gps-status ok'; btn.disabled = false; btn.textContent = '📍 Recapturar ubicación';
+    },
+    (err) => {
+      let msg = '❌ Error obteniendo ubicación.';
+      if(err.code === 1) msg = '❌ Permiso de ubicación denegado. Actívalo en el navegador.';
+      else if(err.code === 2) msg = '❌ Ubicación no disponible. Intenta al aire libre.';
+      else if(err.code === 3) msg = '❌ Tiempo agotado. Intenta de nuevo.';
+      status.textContent = msg; status.className = 'gps-status error'; btn.disabled = false; btn.textContent = '📍 Reintentar captura GPS';
+    },
+    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+  );
+}
+
+function guardarCliente() {
+  const nombre = document.getElementById('inpNombre').value.trim();
+  if(!nombre) { mostrarToast('⚠️ El nombre es obligatorio'); document.getElementById('inpNombre').focus(); return; }
+  const datos = {
+    nombre: nombre, telefono: document.getElementById('inpTelefono').value.trim(),
+    direccion: document.getElementById('inpDireccion').value.trim(),
+    senas: document.getElementById('inpSenas').value.trim(),
+    notas: document.getElementById('inpNotas').value.trim(),
+    lat: gpsActual.lat, lng: gpsActual.lng,
+  };
+  if(clienteEditandoId) {
+    const idx = clientes.findIndex(c => c.id === clienteEditandoId);
+    if(idx >= 0) clientes[idx] = { ...clientes[idx], ...datos, fechaMod: new Date().toISOString() };
+    mostrarToast('✅ Cliente actualizado');
+  } else {
+    clientes.unshift({ id: generarId(), ...datos, fechaAlta: new Date().toISOString() });
+    mostrarToast('✅ Cliente guardado');
+  }
+  guardarLocal(); renderClientes(); cerrarModal('modalCliente');
+}
+
+function eliminarClienteActual() {
+  if(!clienteEditandoId) return;
+  const c = clientes.find(x => x.id === clienteEditandoId); if(!c) return;
+  if(!confirm('¿Eliminar a ' + c.nombre + '? Esta acción no se puede deshacer.')) return;
+  clientes = clientes.filter(x => x.id !== clienteEditandoId);
+  guardarLocal(); renderClientes(); cerrarModal('modalCliente'); mostrarToast('🗑 Cliente eliminado');
+}
+
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function escapeHTML(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timeout); t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function ponerFecha() {
+  const d = new Date();
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('fechaHoy').textContent = dias[d.getDay()] + ', ' + d.getDate() + ' de ' + meses[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+document.getElementById('modalCliente').addEventListener('click', function(e) {
+  if(e.target === this) cerrarModal('modalCliente');
+});
+
+// INICIALIZACIÓN
+ponerFecha();
+cargarClientes();
+renderClientes();
+</script>
+</body>
+</html>

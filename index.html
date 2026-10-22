@@ -158,10 +158,21 @@ textarea.form-input { resize: vertical; min-height: 60px; }
 <div class="toast" id="toast"></div>
 
 <script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz5fMo8RU_kasIwqzJFrNKQBHTUKp_eUTKH4B7Wte71MHb-_i9yt0DkPHiKy4yJKMm80g/exec'; 
 const DB_KEY = 'domi_clientes_v1';
 let clientes = [];
 let clienteEditandoId = null;
 let gpsActual = { lat: null, lng: null };
+
+function enviarASheets(cliente) {
+  if(!SHEET_URL) return;
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cliente)
+  }).catch(err => console.log('Error enviando a Sheets:', err));
+}
 
 function cargarClientes() {
   try { const raw = localStorage.getItem(DB_KEY); if(raw) clientes = JSON.parse(raw) || []; else clientes = []; } catch(e) { clientes = []; }
@@ -295,21 +306,31 @@ function capturarGPS() {
 function guardarCliente() {
   const nombre = document.getElementById('inpNombre').value.trim();
   if(!nombre) { mostrarToast('⚠️ El nombre es obligatorio'); document.getElementById('inpNombre').focus(); return; }
-  const datos = {
-    nombre: nombre, telefono: document.getElementById('inpTelefono').value.trim(),
+  
+  let datos = {
+    nombre: nombre, 
+    telefono: document.getElementById('inpTelefono').value.trim(),
     direccion: document.getElementById('inpDireccion').value.trim(),
     senas: document.getElementById('inpSenas').value.trim(),
     notas: document.getElementById('inpNotas').value.trim(),
-    lat: gpsActual.lat, lng: gpsActual.lng,
+    lat: gpsActual.lat, 
+    lng: gpsActual.lng,
   };
+
   if(clienteEditandoId) {
     const idx = clientes.findIndex(c => c.id === clienteEditandoId);
-    if(idx >= 0) clientes[idx] = { ...clientes[idx], ...datos, fechaMod: new Date().toISOString() };
+    if(idx >= 0) {
+      clientes[idx] = { ...clientes[idx], ...datos, fechaMod: new Date().toISOString() };
+      datos = clientes[idx];
+    }
     mostrarToast('✅ Cliente actualizado');
   } else {
-    clientes.unshift({ id: generarId(), ...datos, fechaAlta: new Date().toISOString() });
+    datos = { id: generarId(), ...datos, fechaAlta: new Date().toISOString() };
+    clientes.unshift(datos);
     mostrarToast('✅ Cliente guardado');
   }
+  
+  enviarASheets(datos);
   guardarLocal(); renderClientes(); cerrarModal('modalCliente');
 }
 
@@ -343,10 +364,9 @@ document.getElementById('modalCliente').addEventListener('click', function(e) {
   if(e.target === this) cerrarModal('modalCliente');
 });
 
-// INICIALIZACIÓN
 ponerFecha();
 cargarClientes();
 renderClientes();
 </script>
 </body>
-</html> 
+</html>

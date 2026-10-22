@@ -348,6 +348,10 @@ document.getElementById('modalCliente').addEventListener('click', function(e) {
 ponerFecha();
 cargarClientes();
 renderClientes();
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
 </script>
 </body>
 </html>

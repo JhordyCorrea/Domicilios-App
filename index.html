@@ -169,7 +169,7 @@ function enviarASheets(cliente) {
   fetch(SHEET_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(cliente)
   }).catch(err => console.log('Error enviando a Sheets:', err));
 }

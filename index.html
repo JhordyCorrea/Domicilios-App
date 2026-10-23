@@ -166,12 +166,8 @@ let gpsActual = { lat: null, lng: null };
 
 function enviarASheets(cliente) {
   if(!SHEET_URL) return;
-  fetch(SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(cliente)
-  }).catch(err => console.log('Error enviando a Sheets:', err));
+  const url = SHEET_URL + '?data=' + encodeURIComponent(JSON.stringify(cliente));
+  fetch(url).catch(err => console.log('Error enviando a Sheets:', err));
 }
 
 function cargarClientes() {

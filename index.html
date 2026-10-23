@@ -158,7 +158,7 @@ textarea.form-input { resize: vertical; min-height: 60px; }
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz5fMo8RU_kasIwqzJFrNKQBHTUKp_eUTKH4B7Wte71MHb-_i9yt0DkPHiKy4yJKMm80g/exec'; 
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwy4yJVP7ibKaHn_CX5pTSVSI3NW2_BtT8D3ySODhISkribjj-J2oBB7DezyFtmkA2KAQ/exec'; 
 const DB_KEY = 'domi_clientes_v1';
 let clientes = [];
 let clienteEditandoId = null;
@@ -232,7 +232,15 @@ function llamar(id) {
 function whatsapp(id) {
   const c = clientes.find(x => x.id === id); if(!c || !c.telefono) return;
   let tel = c.telefono.replace(/[^0-9]/g, ''); if(tel.length === 10) tel = '57' + tel;
-  const texto = encodeURIComponent('Hola ' + c.nombre + ', estoy en camino con tu domicilio.');
+  
+  const hora = new Date().getHours();
+  let saludo = 'buenas noches';
+  if (hora < 12) saludo = 'buenos días';
+  else if (hora < 18) saludo = 'buenas tardes';
+
+  const textoBase = `¡Hola *${c.nombre}*, ${saludo}! 🛵 Estoy en camino con tu domicilio 🍔. Por favor, estar pendiente. Gracias 👋`;
+  const texto = encodeURIComponent(textoBase);
+  
   window.open('https://wa.me/' + tel + '?text=' + texto, '_blank');
 }
 
